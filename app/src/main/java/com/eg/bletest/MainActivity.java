@@ -3,12 +3,15 @@ package com.eg.bletest;
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -64,12 +67,19 @@ public class MainActivity extends Activity {
                     textView = (TextView)findViewById(R.id.status_textView);
                     textView.setText("advertising");
 
-                    blePeri.setService(new String("GAIGER"),
-                            new String("AndroidBLE"),
-                            mWrittenCallback
-                    );
+                    new Thread()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            blePeri.setService("GAIGER",
+                                    "AndroidBLE",
+                                    mWrittenCallback
+                            );
 
-                    blePeri.startAdvertise();
+                            blePeri.startAdvertise();
+                        }
+                    };
                 }
                 else
                 {
@@ -239,9 +249,17 @@ public class MainActivity extends Activity {
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        blePeri.stopAdvertise();
+    }
+
     public void startScanButton(View view)
     {
-        scanLeDevice(true);
+        if (mayUseLocation())
+            scanLeDevice(true);
     }
 
     private void scanLeDevice(final boolean enable)
@@ -272,18 +290,24 @@ public class MainActivity extends Activity {
                 @Override
                 public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord)
                 {
-                    runOnUiThread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
                             System.out.println("Found BLE Server:");
-                            if (device.getUuids() != null)
-                                for (ParcelUuid uuid : device.getUuids())
-                                    System.out.println(uuid.toString());
-
-                        }
-                    });
+                            System.out.print(device.getName());
                 }
             };
+
+    public boolean mayUseLocation()
+    {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+        {
+            return true;
+        }
+        if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        {
+            return true;
+        }
+
+        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 10);
+
+        return false;
+    }
 }

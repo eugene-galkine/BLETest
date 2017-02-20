@@ -20,6 +20,7 @@ import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Handler;
+import android.os.ParcelUuid;
 import android.util.Log;
 
 
@@ -87,6 +88,10 @@ public class BLEPeripheral{
             advBuilder = new AdvertiseData.Builder();
             mAdapter.setName("Eugene's Test BLE Server");
             advBuilder.setIncludeDeviceName(true);
+            String uuid = "9c22389e-f70d-11e6-bc64-92361f002671";
+
+            //advBuilder.addServiceData(ParcelUuid.fromString(uuid), "I am a service".getBytes());
+            advBuilder.addServiceUuid(ParcelUuid.fromString(uuid));
         }
 
 
@@ -372,15 +377,6 @@ public class BLEPeripheral{
         mGattServer.addService(AService);
     }
 
-
-    public void startAdvertise(String scanRespenseName)
-    {
-        mAdapter.setName(scanRespenseName);
-        advBuilder.setIncludeDeviceName(true);
-
-        startAdvertise();
-    }
-
     public void startAdvertise()
     {
         if(null == mAdapter)
@@ -392,8 +388,10 @@ public class BLEPeripheral{
         if(null == mLeAdvertiser)
             return;
 
-        mLeAdvertiser.startAdvertising(settingBuilder.build(),
-                advBuilder.build(), mAdvCallback);
+
+                mLeAdvertiser.startAdvertising(settingBuilder.build(),
+                        advBuilder.build(), mAdvCallback);
+
     }
 
     public void stopAdvertise()

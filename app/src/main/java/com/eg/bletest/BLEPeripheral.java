@@ -78,9 +78,9 @@ public class BLEPeripheral{
         if(null == settingBuilder)
         {
             settingBuilder = new AdvertiseSettings.Builder();
-            settingBuilder.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER);
+            settingBuilder.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED);
             settingBuilder.setConnectable(true);
-            settingBuilder.setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_ULTRA_LOW);
+            settingBuilder.setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_LOW);
         }
 
         if(null == advBuilder)
@@ -88,10 +88,10 @@ public class BLEPeripheral{
             advBuilder = new AdvertiseData.Builder();
             mAdapter.setName("Eugene's Test BLE Server");
             advBuilder.setIncludeDeviceName(true);
-            String uuid = "9c22389e-f70d-11e6-bc64-92361f002671";
+            //String uuid = "9c22389e-f70d-11e6-bc64-92361f002671";
 
             //advBuilder.addServiceData(ParcelUuid.fromString(uuid), "I am a service".getBytes());
-            advBuilder.addServiceUuid(ParcelUuid.fromString(uuid));
+            //advBuilder.addServiceUuid(ParcelUuid.fromString(uuid));
         }
 
 

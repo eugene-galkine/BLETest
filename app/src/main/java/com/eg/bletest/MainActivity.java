@@ -21,12 +21,22 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity
+{
+    public static MainActivity getInstance()
+    {
+        return instance;
+    }
+
+    private static MainActivity instance;
 
     private BLEPeripheral blePeri;
     private CheckBox  adverstiseCheckBox;
@@ -37,6 +47,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        instance = this;
 
         adverstiseCheckBox = (CheckBox) findViewById(R.id.advertise_checkBox);
 
@@ -106,6 +118,7 @@ public class MainActivity extends Activity {
                     Toast.LENGTH_LONG).show();
         }
 
+        new ScanResult("address", "name", "rssi",(TableLayout) findViewById(R.id.table_layout));
     }
 
 
@@ -259,7 +272,10 @@ public class MainActivity extends Activity {
     public void startScanButton(View view)
     {
         if (mayUseLocation())
+        {
+            ScanResult.getInstance().clear();
             scanLeDevice(true);
+        }
     }
 
     private void scanLeDevice(final boolean enable)
@@ -290,8 +306,13 @@ public class MainActivity extends Activity {
                 @Override
                 public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord)
                 {
-                            System.out.println("Found BLE Server:");
-                            System.out.print(device.getName());
+                    System.out.println("Found BLE Server: " + device.getName());
+                    System.out.println(device.getAddress());
+                    System.out.println(rssi);
+                    //for (byte)
+                    System.out.println(new String(scanRecord));
+
+                    ScanResult.getInstance().addRow(device.getAddress(), device.getName(), rssi + "");
                 }
             };
 
@@ -309,5 +330,10 @@ public class MainActivity extends Activity {
         requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 10);
 
         return false;
+    }
+
+    public ViewGroup.LayoutParams getColParams()
+    {
+        return findViewById(R.id.textView).getLayoutParams();
     }
 }

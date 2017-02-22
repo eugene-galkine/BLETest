@@ -1,6 +1,5 @@
 package com.eg.bletest;
 
-import java.util.List;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
@@ -12,15 +11,12 @@ import android.bluetooth.BluetoothGattServer;
 import android.bluetooth.BluetoothGattServerCallback;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.os.Handler;
-import android.os.ParcelUuid;
 import android.util.Log;
 
 
@@ -31,23 +27,20 @@ public class BLEPeripheral{
     }
 
 
-    BluetoothManager mManager;
-    BluetoothAdapter mAdapter;
+    private BluetoothManager mManager;
+    private BluetoothAdapter mAdapter;
+    private BluetoothLeAdvertiser  mLeAdvertiser;
+    private AdvertiseSettings.Builder settingBuilder;
+    private AdvertiseData.Builder advBuilder;
+    private BluetoothGattServer  mGattServer;
+    private ConnectionCallback mConnectionCallback;
 
-    BluetoothLeAdvertiser  mLeAdvertiser;
-
-    AdvertiseSettings.Builder settingBuilder;
-    AdvertiseData.Builder advBuilder;
-
-    BluetoothGattServer  mGattServer;
-
-    ConnectionCallback mConnectionCallback;
 
     public interface WriteCallback {
         void onWrite(byte[] data);
     }
 
-    WriteCallback mWriteCallback;
+    private WriteCallback mWriteCallback;
 
     public static boolean isEnableBluetooth(){
         return BluetoothAdapter.getDefaultAdapter().isEnabled();
@@ -62,7 +55,7 @@ public class BLEPeripheral{
             if(null == mManager)
                 return -1;
 
-            if(false == context.getPackageManager().
+            if(!context.getPackageManager().
                     hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE))
                 return -2;
         }
@@ -71,7 +64,7 @@ public class BLEPeripheral{
         {
             mAdapter = mManager.getAdapter();
 
-            if(false == mAdapter.isMultipleAdvertisementSupported())
+            if(!mAdapter.isMultipleAdvertisementSupported())
                 return -3;
         }
 
@@ -255,8 +248,8 @@ public class BLEPeripheral{
                 UUID.fromString(TEST_STRING),
                 BluetoothGattService.SERVICE_TYPE_SECONDARY);
 
-        softwareVerCharacteristic.setValue(new String("0.0.0").getBytes());
-        softwareVerCharacteristic1.setValue(new String("test").getBytes());
+        softwareVerCharacteristic.setValue("0.0.0".getBytes());
+        softwareVerCharacteristic1.setValue("test".getBytes());
 
         deviceInfoService.addCharacteristic(softwareVerCharacteristic);
         deviceInfoService1.addCharacteristic(softwareVerCharacteristic1);
@@ -329,7 +322,7 @@ public class BLEPeripheral{
 
 
 
-        final BluetoothGattCharacteristic notifyCharacteristic = new BluetoothGattCharacteristic(
+        /*final BluetoothGattCharacteristic notifyCharacteristic = new BluetoothGattCharacteristic(
                 UUID.fromString(CHAR_NOTIFY),
                 BluetoothGattCharacteristic.PROPERTY_NOTIFY,
                 BluetoothGattCharacteristic.PERMISSION_READ
@@ -338,8 +331,6 @@ public class BLEPeripheral{
 
         notifyCharacteristic.setValue(new String("0"));
         AService.addCharacteristic(notifyCharacteristic);
-
-        final Handler handler = new Handler();
 
         Thread thread = new Thread() {
             int i = 0;
@@ -371,7 +362,7 @@ public class BLEPeripheral{
             }
         };
 
-        thread.start();
+        thread.start();*/
 
 
         mGattServer.addService(AService);

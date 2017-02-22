@@ -69,7 +69,7 @@ public class MainActivity1 extends AppCompatActivity
         blePeri = new BLEPeripheral();
     }
 
-    @Override
+    /*@Override
     protected void onPause()
     {
         super.onPause();
@@ -233,7 +233,7 @@ public class MainActivity1 extends AppCompatActivity
                         {
                             requestPermissions(new String[]{ACCESS_COARSE_LOCATION}, REQUEST_COURSE_LOCATION);
                         }
-                    });*/
+                    });
             requestPermissions(new String[]{ACCESS_COARSE_LOCATION}, REQUEST_COURSE_LOCATION);
             System.out.println("SHOULD SHOW RATIONALE");
         } else
@@ -241,5 +241,5 @@ public class MainActivity1 extends AppCompatActivity
             requestPermissions(new String[]{ACCESS_COARSE_LOCATION}, REQUEST_COURSE_LOCATION);
         }
         return false;
-    }
+    }*/
 }

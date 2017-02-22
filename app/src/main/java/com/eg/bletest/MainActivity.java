@@ -79,6 +79,8 @@ public class MainActivity extends Activity
                     textView = (TextView)findViewById(R.id.status_textView);
                     textView.setText("advertising");
 
+                    final Handler handler = new Handler();
+
                     new Thread()
                     {
                         @Override
@@ -91,7 +93,7 @@ public class MainActivity extends Activity
 
                             blePeri.startAdvertise();
                         }
-                    };
+                    }.start();
                 }
                 else
                 {
@@ -105,7 +107,7 @@ public class MainActivity extends Activity
 
         adverstiseCheckBox.setEnabled(false);
 
-        if(false == BLEPeripheral.isEnableBluetooth())
+        if(!BLEPeripheral.isEnableBluetooth())
         {
 
             Intent intentBtEnabled = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);

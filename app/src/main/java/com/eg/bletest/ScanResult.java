@@ -1,5 +1,8 @@
 package com.eg.bletest;
 
+import android.bluetooth.BluetoothClass;
+import android.bluetooth.BluetoothDevice;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -20,33 +23,37 @@ public class ScanResult
     private Row rootRow;
     private TableLayout table;
 
-    public ScanResult(String addressText, String nameText, String rssi, TableLayout table)
+    public ScanResult(BluetoothDevice device, String rssi, TableLayout table)
     {
         this.table = table;
         instance = this;
-        rootRow = new Row (addressText, nameText, rssi);
+        rootRow = new Row (device, rssi);
 
     }
 
-    public void addRow(String address, String name, String s)
+    public void addRow(BluetoothDevice device, String s)
     {
-        Row r = exists(address);
+        Row r = exists(device.getAddress());
 
         if (r == null)
         {
-            r = new Row(address, name, s);
+            r = new Row(device, s);
             getLast().setNext(r);
             table.addView(r.row);
         } else
         {
-            r.update(address, name, s);
+            r.update(device.getAddress(), device.getName(), s);
         }
 
     }
 
     public Row exists(String address)
     {
-        Row index = rootRow;
+        Row index = rootRow == null ? null : rootRow.getNext();
+
+
+
+
         while (index != null)
         {
             if (index.equals(address))
@@ -91,17 +98,21 @@ public class ScanResult
         private TextView name;
         private TextView rssi;
 
-        public Row(String addressText, String nameText, String rssiText) {
+        private Row(final BluetoothDevice device, String rssiText)
+        {
+            if (device == null)
+                return;
+
             row = new TableRow(MainActivity.getInstance());
             row.setWeightSum(4);
 
             address = new TextView(MainActivity.getInstance());
-            address.setText(addressText);
+            address.setText(device.getAddress());
             address.setLayoutParams(MainActivity.getInstance().getColParams());
             row.addView(address);
 
             name = new TextView(MainActivity.getInstance());
-            name.setText(nameText == null ? "unknown" : nameText);
+            name.setText(device.getName() == null ? "null" : device.getName());
             name.setLayoutParams(MainActivity.getInstance().getColParams());
             row.addView(name);
 
@@ -113,6 +124,14 @@ public class ScanResult
             Button button = new Button(MainActivity.getInstance());
             button.setText("Connect");
             button.setLayoutParams(MainActivity.getInstance().getColParams());
+            button.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    device.connectGatt(MainActivity.getInstance(), false, MainActivity.getInstance().mGattCallback);
+                }
+            });
             row.addView(button);
         }
 
@@ -125,14 +144,18 @@ public class ScanResult
             return next;
         }
 
-        public boolean equals(String text) {
-            return address.getText().toString().equals(text);
+        public boolean equals(String text)
+        {
+            return address == null || address.getText().toString().equals(text);
         }
 
         public void update(String addressText, String nameText, String rssiText)
         {
+            if (address == null)
+                return;
+
             address.setText(addressText);
-            name.setText(nameText == null ? "unknown" : nameText);
+            name.setText(nameText == null ? "null" : nameText);
             rssi.setText(rssiText);
         }
 
